@@ -44,7 +44,7 @@ ARG INSTALL_SOAP=false
 RUN if [ ${INSTALL_SOAP} = true ]; then \
     # Install the soap extension
     apt-get -y update && \
-    apt-get -y install libxml2-dev && \ 
+    apt-get -y install libxml2-dev && \
     docker-php-ext-install soap \
 ;fi
 
@@ -160,7 +160,7 @@ RUN if [ ${CODEIGNITER} = true ]; then \
 ADD ./laravel.ini /usr/local/etc/php/conf.d
 ADD ./laravel.pool.conf /usr/local/etc/php-fpm.d/
 
-RUN rm -r /var/lib/apt/lists/*
+#RUN rm -r /var/lib/apt/lists/*
 
 RUN usermod -u 1000 www-data
 

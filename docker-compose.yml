@@ -7,7 +7,7 @@ services:
     applications:
         image: tianon/true
         volumes:
-            - ../:/var/www
+            - ../:/var/www/public
 #            - ../sample/:/var/www/sample
 
 ### Workspace Utilities Container ###########################
@@ -18,13 +18,13 @@ services:
             args:
                 - INSTALL_XDEBUG=false
                 - INSTALL_MONGO=false
-                - INSTALL_NODE=false
-                - INSTALL_YARN=false
+                - INSTALL_NODE=true
+                - INSTALL_YARN=true
                 - INSTALL_DRUSH=false
                 - INSTALL_AEROSPIKE_EXTENSION=false
                 - INSTALL_V8JS_EXTENSION=false
-                - COMPOSER_GLOBAL_INSTALL=false
-                - INSTALL_WORKSPACE_SSH=false
+                - COMPOSER_GLOBAL_INSTALL=true
+                - INSTALL_WORKSPACE_SSH=true
                 - INSTALL_LARAVEL_ENVOY=false
                 - PUID=1000
                 - PGID=1000
@@ -35,10 +35,16 @@ services:
             - applications
         extra_hosts:
             # IMPORTANT: Replace with your Docker Host IP (will be appended to /etc/hosts)
-            - "dockerhost:10.0.75.1"
+            #- "dockerhost:10.0.75.1"
+            - "dockerhost:172.17.0.1"
         ports:
            - "2222:22"
         tty: true
+        links:
+            - redis
+            - mysql
+        environment:
+            - PATH=$PATH:/home/laradock/.yarn/bin:/var/www/vendor/bin:/home/laradock/.nvm/versions/node/v7.3.0/bin
 
 ### PHP-FPM Container #######################################
 
@@ -49,13 +55,13 @@ services:
                 - INSTALL_XDEBUG=false
                 - INSTALL_SOAP=false
                 - INSTALL_MONGO=false
-                - INSTALL_ZIP_ARCHIVE=false
-                - INSTALL_BCMATH=false
+                - INSTALL_ZIP_ARCHIVE=true
+                - INSTALL_BCMATH=true
                 - INSTALL_MEMCACHED=false
-                - INSTALL_OPCACHE=false
+                - INSTALL_OPCACHE=true
                 - INSTALL_AEROSPIKE_EXTENSION=false
                 - CODEIGNITER=false
-            dockerfile: Dockerfile-70
+            dockerfile: Dockerfile-56
         volumes_from:
             - applications
         expose:
@@ -64,7 +70,7 @@ services:
             - workspace
         extra_hosts:
             # IMPORTANT: Replace with your Docker Host IP (will be appended to /etc/hosts)
-            - "dockerhost:10.0.75.1"
+            - "dockerhost:172.17.0.1"
         environment:
             # IMPORTANT: Set the Remote Interpreter entry matching name to `laravel`
             - PHP_IDE_CONFIG=serverName=laravel
@@ -118,7 +124,7 @@ services:
 ### MySQL Container #########################################
 
     mysql:
-        build: 
+        build:
             context: ./mysql
             args:
                 - MYSQL_DATABASE=homestead
@@ -127,6 +133,7 @@ services:
                 - MYSQL_ROOT_PASSWORD=root
         volumes:
             - mysql:/var/lib/mysql
+            - ./mysql:/var/lib/mysql
         ports:
             - "3306:3306"
 
@@ -190,7 +197,7 @@ services:
             - "27017:27017"
         volumes:
             - mongo:/data/db
-            
+
 ### RethinkDB Container #######################################
 
     rethinkdb:
